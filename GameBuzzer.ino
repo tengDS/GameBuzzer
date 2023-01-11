@@ -6,6 +6,12 @@
 #define WHITE_BUTTON 3
 #define GREEN_BUTTON 4
 
+#define BUZZER 5
+#define FREQ 2093
+#define DUR 100
+#define PAUSE 150
+
+
 enum ButtonState {
   UNPRESSED,
   PRESSED
@@ -21,24 +27,10 @@ enum SystemState {
 
 SystemState currState;
 
-void setup() {
-  Serial.begin(115200);
-
-  // put LED pins in output mode.
-  pinMode(RED_LED, OUTPUT);
-  pinMode(WHITE_LED, OUTPUT);
-  pinMode(GREEN_LED, OUTPUT);
-
-  // put button pins into pullup input mode.
-  pinMode(RED_BUTTON, INPUT_PULLUP);
-  pinMode(WHITE_BUTTON, INPUT_PULLUP);
-  pinMode(GREEN_BUTTON, INPUT_PULLUP);
-
-  // set button states.
-  prevGreen = UNPRESSED;
-
-  // set system state.
-  resetSystem();
+void playChime() {
+  tone(BUZZER, FREQ, DUR);
+  delay(PAUSE);
+  tone(BUZZER, FREQ, DUR);
 }
 
 void enableLED(byte pin) {
@@ -84,6 +76,7 @@ void checkButtons() {
     // red only wins if system was in armed state and red button is pressed.
     currState = RED_WON;
     enableLED(RED_LED);
+    playChime();
   }
 
   // check white button.
@@ -92,7 +85,28 @@ void checkButtons() {
     // white only wins if the system was in armed state and white button is pressed.
     currState = WHITE_WON;
     enableLED(WHITE_LED);
+    playChime();
   }
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  // put LED pins in output mode.
+  pinMode(RED_LED, OUTPUT);
+  pinMode(WHITE_LED, OUTPUT);
+  pinMode(GREEN_LED, OUTPUT);
+
+  // put button pins into pullup input mode.
+  pinMode(RED_BUTTON, INPUT_PULLUP);
+  pinMode(WHITE_BUTTON, INPUT_PULLUP);
+  pinMode(GREEN_BUTTON, INPUT_PULLUP);
+
+  // set button states.
+  prevGreen = UNPRESSED;
+
+  // set system state.
+  resetSystem();
 }
 
 void loop() {
